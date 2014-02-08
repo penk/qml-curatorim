@@ -3,10 +3,9 @@ import QtQuick.Window 2.0
 import QtQuick.XmlListModel 2.0
 
 Item {
-    id: root
-    //title: "小海嚴選" 
     width: 960
     height: 600
+    id: root
     Component {
         id: delegate
         Column { 
@@ -65,7 +64,7 @@ Item {
     }
     Flickable { 
         id: view
-        anchors.fill: parent
+        anchors.fill: root
         contentWidth: parent.width
         contentHeight: 450 * leftModel.count
         ListView {
@@ -98,7 +97,7 @@ Item {
         visible: false
         anchors.fill: parent
         color: "black"
-        opacity: 0.5
+        opacity: 0.7
         MouseArea { 
             anchors.fill: parent;
             onClicked: { stage.visible = false; root.state = 'closed' }
