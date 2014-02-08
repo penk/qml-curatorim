@@ -1,4 +1,4 @@
 qml-curatorim
 =============
 
-![stream](http://i.imgur.com/FmqcNim.png)
+![stream](http://i.imgur.com/PoIvYMq.png)
