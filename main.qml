@@ -2,10 +2,12 @@ import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.XmlListModel 2.0
 
-Item {
+Window {
     width: 960
     height: 600
+    title: "正妹流 | 小海嚴選"
     id: root
+    visible: true
     Component {
         id: delegate
         Column { 
@@ -17,7 +19,7 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        (root.state == 'closed') ? root.state = 'opened' : root.state = 'closed';
+                        (highlight.state == 'closed') ? highlight.state = 'opened' : highlight.state = 'closed';
                         stage.visible = true
                         highlight.source = parent.source
                         highlight.visible = true
@@ -64,7 +66,7 @@ Item {
     }
     Flickable { 
         id: view
-        anchors.fill: root
+        anchors.fill: parent
         contentWidth: parent.width
         contentHeight: 450 * leftModel.count
         ListView {
@@ -100,7 +102,7 @@ Item {
         opacity: 0.7
         MouseArea { 
             anchors.fill: parent;
-            onClicked: { stage.visible = false; root.state = 'closed' }
+            onClicked: { stage.visible = false; highlight.state = 'closed' }
         }
     }
     Image {
@@ -114,10 +116,9 @@ Item {
             onClicked: { 
                 //Qt.openUrlExternally()
                 stage.visible = false; 
-                root.state = 'closed'
+                parent.state = 'closed'
             } 
         }
-    }
     state: 'closed'
     states: [
         State{
@@ -135,4 +136,5 @@ Item {
             NumberAnimation { target: highlight; properties: "height"; duration: 300; easing.type: Easing.InOutQuad; }
         }
     ]
+    }
 }
