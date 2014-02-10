@@ -8,6 +8,44 @@ Window {
     title: "正妹流 | 小海嚴選"
     id: root
     visible: true
+    property variant page: 1
+    property variant token: "Put your token here.."
+
+    Component.onCompleted: {
+        fetchStream(page);
+    }
+    function fetchStream(page) {
+        var xhr = new XMLHttpRequest();
+        console.log('fetchStream: ', page);
+        xhr.open("GET", "http://curator.im/api/stream/?token="+token+"&page="+page, true); 
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == xhr.DONE) {
+                var response;
+                try { response = JSON.parse(xhr.responseText); } catch (e) { console.error(e) }
+                if (typeof response !== 'object') { console.log('Failed to load json: Malformed JSON'); }
+                for (var i=0; i<response['results'].length; i++) {
+                    switch(i%3) {
+                        case 0:
+                        leftModel.append({'title': response['results'][i].name,
+                        'itemurl': response['results'][i].url,
+                        'description': response['results'][i].image});
+                        break;
+                        case 1:
+                        middleModel.append({'title': response['results'][i].name,
+                        'itemurl': response['results'][i].url, 
+                        'description': response['results'][i].image});
+                        break;
+                        case 2:
+                        rightModel.append({'title': response['results'][i].name,
+                        'itemurl': response['results'][i].url,
+                        'description': response['results'][i].image});
+                        break;
+                    }
+                }
+            }
+        }
+        xhr.send();
+    }
     Component {
         id: delegate
         Column { 
@@ -15,7 +53,7 @@ Window {
                 width: 300
                 fillMode: Image.PreserveAspectFit
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: 'http://'+ description.match(new RegExp('media.curator.im(.*)jpg'))[0];
+                source: description 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
@@ -35,40 +73,18 @@ Window {
     ListModel { id: leftModel }
     ListModel { id: middleModel }
     ListModel { id: rightModel }
-    XmlListModel {
-        id: model
-        source: "http://feeds.feedburner.com/curator-stream"
-        query: "/rss/channel/item"
-        XmlRole { name: "title"; query: "title/string()" }
-        XmlRole { name: "description"; query: "description/string()" }
-        XmlRole { name: "itemurl"; query: "guid/string()" }
-        onStatusChanged: { 
-            for (var i=0; i<model.count; i++) {
-                switch(i%3) { 
-                    case 0: 
-                    leftModel.append({'title': model.get(i).title,
-                    'itemurl': model.get(i).itemurl,
-                    'description': model.get(i).description});
-                    break;
-                    case 1: 
-                    middleModel.append({'title': model.get(i).title,
-                    'itemurl': model.get(i).itemurl,
-                    'description': model.get(i).description});
-                    break;
-                    case 2:
-                    rightModel.append({'title': model.get(i).title,
-                    'itemurl': model.get(i).itemurl,
-                    'description': model.get(i).description});
-                    break;
-                }
-            }
-        }
-    }
     Flickable { 
         id: view
         anchors.fill: parent
         contentWidth: parent.width
-        contentHeight: 450 * leftModel.count
+        contentHeight: 400 * leftModel.count
+        onAtYEndChanged: {
+            console.log('onAtYEndChanged', view.atYEnd)
+            if (view.atYEnd && !view.atYBeginning) {
+                page++; 
+                fetchStream(page);
+            }
+        }
         ListView {
             id: leftView
             interactive: false
